@@ -1,5 +1,5 @@
 import SQLite from 'react-native-sqlite-storage';
-import { Flashcard, Deck, IdeaState, StudySession } from '../types';
+import { Flashcard, Deck, IdeaState } from '../types';
 
 SQLite.DEBUG(false);
 SQLite.enablePromise(true);
@@ -125,20 +125,27 @@ export const closeDatabase = async (): Promise<void> => {
 };
 
 // Deck CRUD operations
-export const createDeck = async (deck: Deck): Promise<void> => {
+export const createDeck = async (
+  deckData: Omit<Deck, 'id' | 'createdAt' | 'updatedAt'>
+): Promise<string> => {
   const db = getDatabase();
+  const id = `deck_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`;
+  const now = Date.now();
+
   const query = `
     INSERT INTO decks (id, name, description, color, createdAt, updatedAt)
     VALUES (?, ?, ?, ?, ?, ?)
   `;
   await db.executeSql(query, [
-    deck.id,
-    deck.name,
-    deck.description || '',
-    deck.color,
-    deck.createdAt,
-    deck.updatedAt,
+    id,
+    deckData.name,
+    deckData.description || '',
+    deckData.color || '#FFD700',
+    now,
+    now,
   ]);
+
+  return id;
 };
 
 export const getAllDecks = async (): Promise<Deck[]> => {
@@ -153,24 +160,31 @@ export const getAllDecks = async (): Promise<Deck[]> => {
 };
 
 // Flashcard CRUD operations
-export const createFlashcard = async (card: Flashcard): Promise<void> => {
+export const createFlashcard = async (
+  cardData: Pick<Flashcard, 'deckId' | 'front' | 'back'>
+): Promise<string> => {
   const db = getDatabase();
+  const id = `card_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`;
+  const now = Date.now();
+
   const query = `
     INSERT INTO flashcards (id, deckId, front, back, intervalDays, easeFactor, repetitionCount, nextReviewAt, createdAt, updatedAt)
     VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
   `;
   await db.executeSql(query, [
-    card.id,
-    card.deckId,
-    card.front,
-    card.back,
-    card.intervalDays,
-    card.easeFactor,
-    card.repetitionCount,
-    card.nextReviewAt,
-    card.createdAt,
-    card.updatedAt,
+    id,
+    cardData.deckId,
+    cardData.front,
+    cardData.back,
+    0, // intervalDays
+    2.5, // easeFactor (SM-2 default)
+    0, // repetitionCount
+    null, // nextReviewAt
+    now,
+    now,
   ]);
+
+  return id;
 };
 
 export const updateFlashcard = async (card: Flashcard): Promise<void> => {
