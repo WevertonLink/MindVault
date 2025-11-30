@@ -19,3 +19,11 @@ buildscript {
 }
 
 apply plugin: "com.facebook.react.rootproject"
+
+// Fix for libraries using deprecated jcenter() with Gradle 9
+allprojects {
+    repositories {
+        google()
+        mavenCentral()
+    }
+}
