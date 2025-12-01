@@ -17,6 +17,7 @@ import { useAppStore } from '../store';
 import { Flashcard, CardRating } from '../types';
 import { updateCardSRS } from '../services/srs';
 import { getDueFlashcards, updateFlashcard } from '../database';
+import { haptics } from '../utils/haptics';
 
 type StudyScreenNavigationProp = StackNavigationProp<RootStackParamList, 'Study'>;
 type StudyScreenRouteProp = RouteProp<RootStackParamList, 'Study'>;
@@ -50,6 +51,7 @@ const StudyScreen: React.FC<Props> = ({ navigation }) => {
   };
 
   const handleFlip = () => {
+    haptics.light();
     Animated.timing(flipAnimation, {
       toValue: isFlipped ? 0 : 180,
       duration: 300,
@@ -60,6 +62,15 @@ const StudyScreen: React.FC<Props> = ({ navigation }) => {
 
   const handleRating = async (rating: CardRating) => {
     if (currentIndex >= cards.length) return;
+
+    // Different haptic feedback based on rating
+    if (rating === 'easy') {
+      haptics.success();
+    } else if (rating === 'medium') {
+      haptics.medium();
+    } else {
+      haptics.warning();
+    }
 
     const currentCard = cards[currentIndex];
     const updatedCard = updateCardSRS(currentCard, rating);
@@ -75,9 +86,11 @@ const StudyScreen: React.FC<Props> = ({ navigation }) => {
         flipAnimation.setValue(0);
       } else {
         // Study session complete
+        haptics.heavy(); // Big success for completing all cards
         navigation.goBack();
       }
     } catch (error) {
+      haptics.error();
       console.error('Error updating card:', error);
     }
   };

@@ -233,6 +233,19 @@ export const getDueFlashcards = async (): Promise<Flashcard[]> => {
   return cards;
 };
 
+export const deleteFlashcard = async (cardId: string): Promise<void> => {
+  const db = getDatabase();
+  await db.executeSql('DELETE FROM flashcards WHERE id = ?', [cardId]);
+};
+
+export const deleteDeck = async (deckId: string): Promise<void> => {
+  const db = getDatabase();
+  // Delete all flashcards in the deck first (cascading should handle this, but being explicit)
+  await db.executeSql('DELETE FROM flashcards WHERE deckId = ?', [deckId]);
+  // Then delete the deck
+  await db.executeSql('DELETE FROM decks WHERE id = ?', [deckId]);
+};
+
 // Idea CRUD operations
 export const createIdea = async (idea: IdeaState): Promise<void> => {
   const db = getDatabase();

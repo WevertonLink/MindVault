@@ -16,8 +16,9 @@ import LinearGradient from 'react-native-linear-gradient';
 import { RootStackParamList } from '../navigation/types';
 import { Card, Header } from '../components';
 import { theme } from '../theme';
-import { getAllDecks, getFlashcardsByDeck, createDeck } from '../database';
+import { getAllDecks, getFlashcardsByDeck, createDeck, deleteDeck } from '../database';
 import { Deck } from '../types';
+import { haptics } from '../utils/haptics';
 
 type DeckManagementScreenNavigationProp = StackNavigationProp<RootStackParamList, 'DeckManagement'>;
 
@@ -61,6 +62,7 @@ const DeckManagementScreen: React.FC<Props> = ({ navigation }) => {
 
   const handleCreateDeck = async () => {
     if (!newDeckName.trim()) {
+      haptics.warning();
       Alert.alert('Erro', 'Digite um nome para o deck');
       return;
     }
@@ -72,11 +74,13 @@ const DeckManagementScreen: React.FC<Props> = ({ navigation }) => {
         color: '#FFD700',
       });
 
+      haptics.success();
       setNewDeckName('');
       setNewDeckDescription('');
       setShowCreateModal(false);
       loadDecks();
     } catch (error) {
+      haptics.error();
       Alert.alert('Erro', 'Não foi possível criar o deck');
       console.error('Error creating deck:', error);
     }
@@ -84,6 +88,33 @@ const DeckManagementScreen: React.FC<Props> = ({ navigation }) => {
 
   const handleDeckPress = (deck: Deck) => {
     navigation.navigate('FlashcardEditor', { deckId: deck.id, deckName: deck.name });
+  };
+
+  const handleDeleteDeck = (deck: Deck) => {
+    haptics.medium(); // Feedback for long press
+    const cardCount = deckCardCounts[deck.id] || 0;
+    Alert.alert(
+      'Deletar Deck',
+      `Tem certeza que deseja deletar "${deck.name}"?${cardCount > 0 ? ` Isso irá deletar ${cardCount} card(s).` : ''}`,
+      [
+        { text: 'Cancelar', style: 'cancel', onPress: () => haptics.light() },
+        {
+          text: 'Deletar',
+          style: 'destructive',
+          onPress: async () => {
+            try {
+              await deleteDeck(deck.id);
+              haptics.success();
+              loadDecks();
+            } catch (error) {
+              haptics.error();
+              Alert.alert('Erro', 'Não foi possível deletar o deck');
+              console.error('Error deleting deck:', error);
+            }
+          },
+        },
+      ]
+    );
   };
 
   if (loading) {
@@ -135,6 +166,7 @@ const DeckManagementScreen: React.FC<Props> = ({ navigation }) => {
               <TouchableOpacity
                 key={deck.id}
                 onPress={() => handleDeckPress(deck)}
+                onLongPress={() => handleDeleteDeck(deck)}
                 activeOpacity={0.8}
               >
                 <Card variant="elevated" style={styles.deckCard}>
@@ -155,6 +187,7 @@ const DeckManagementScreen: React.FC<Props> = ({ navigation }) => {
                     </Text>
                     <Text style={styles.deckArrow}>→</Text>
                   </View>
+                  <Text style={styles.deckHint}>Pressione e segure para deletar</Text>
                 </Card>
               </TouchableOpacity>
             ))}
@@ -337,6 +370,14 @@ const styles = StyleSheet.create({
   deckArrow: {
     fontSize: 20,
     color: theme.colors.textTertiary,
+  },
+  deckHint: {
+    fontSize: theme.typography.fontSize.xs,
+    fontFamily: theme.typography.fontFamily.regular,
+    color: theme.colors.textMuted,
+    textAlign: 'center',
+    marginTop: theme.spacing.sm,
+    fontStyle: 'italic',
   },
   fab: {
     position: 'absolute',

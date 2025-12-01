@@ -17,8 +17,9 @@ import LinearGradient from 'react-native-linear-gradient';
 import { RootStackParamList } from '../navigation/types';
 import { Header } from '../components';
 import { theme } from '../theme';
-import { getFlashcardsByDeck, createFlashcard } from '../database';
+import { getFlashcardsByDeck, createFlashcard, deleteFlashcard } from '../database';
 import { Flashcard } from '../types';
+import { haptics } from '../utils/haptics';
 
 type FlashcardEditorScreenNavigationProp = StackNavigationProp<RootStackParamList, 'FlashcardEditor'>;
 type FlashcardEditorScreenRouteProp = RouteProp<RootStackParamList, 'FlashcardEditor'>;
@@ -55,6 +56,7 @@ const FlashcardEditorScreen: React.FC<Props> = ({ navigation, route }) => {
 
   const handleCreateFlashcard = async () => {
     if (!cardFront.trim() || !cardBack.trim()) {
+      haptics.warning();
       Alert.alert('Erro', 'Preencha a frente e o verso do card');
       return;
     }
@@ -67,14 +69,42 @@ const FlashcardEditorScreen: React.FC<Props> = ({ navigation, route }) => {
         nextReviewAt: Date.now(), // Make immediately available for review
       });
 
+      haptics.success();
       setCardFront('');
       setCardBack('');
       setShowCreateModal(false);
       loadFlashcards();
     } catch (error) {
+      haptics.error();
       Alert.alert('Erro', 'Não foi possível criar o flashcard');
       console.error('Error creating flashcard:', error);
     }
+  };
+
+  const handleDeleteFlashcard = (card: Flashcard, index: number) => {
+    haptics.medium();
+    Alert.alert(
+      'Deletar Flashcard',
+      `Tem certeza que deseja deletar o card #${index + 1}?`,
+      [
+        { text: 'Cancelar', style: 'cancel', onPress: () => haptics.light() },
+        {
+          text: 'Deletar',
+          style: 'destructive',
+          onPress: async () => {
+            try {
+              await deleteFlashcard(card.id);
+              haptics.success();
+              loadFlashcards();
+            } catch (error) {
+              haptics.error();
+              Alert.alert('Erro', 'Não foi possível deletar o flashcard');
+              console.error('Error deleting flashcard:', error);
+            }
+          },
+        },
+      ]
+    );
   };
 
   if (loading) {
@@ -124,8 +154,17 @@ const FlashcardEditorScreen: React.FC<Props> = ({ navigation, route }) => {
           <View style={styles.cardsContainer}>
             {flashcards.map((card, index) => (
               <View key={card.id} style={styles.cardItem}>
-                <View style={styles.cardNumber}>
-                  <Text style={styles.cardNumberText}>#{index + 1}</Text>
+                <View style={styles.cardHeader}>
+                  <View style={styles.cardNumber}>
+                    <Text style={styles.cardNumberText}>#{index + 1}</Text>
+                  </View>
+                  <TouchableOpacity
+                    onPress={() => handleDeleteFlashcard(card, index)}
+                    style={styles.deleteButton}
+                    activeOpacity={0.7}
+                  >
+                    <Text style={styles.deleteButtonText}>🗑️</Text>
+                  </TouchableOpacity>
                 </View>
                 <View style={styles.cardContent}>
                   <View style={styles.cardSide}>
@@ -285,14 +324,30 @@ const styles = StyleSheet.create({
     padding: theme.spacing.lg,
     ...theme.shadows.sm,
   },
-  cardNumber: {
+  cardHeader: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'center',
     marginBottom: theme.spacing.md,
+  },
+  cardNumber: {
+    flex: 1,
   },
   cardNumberText: {
     fontSize: theme.typography.fontSize.small,
     fontFamily: theme.typography.fontFamily.bold,
     color: theme.colors.gold,
     letterSpacing: theme.typography.letterSpacing.wide,
+  },
+  deleteButton: {
+    padding: theme.spacing.sm,
+    borderRadius: theme.borderRadius.md,
+    backgroundColor: 'rgba(255, 68, 68, 0.1)',
+    borderWidth: 1,
+    borderColor: 'rgba(255, 68, 68, 0.3)',
+  },
+  deleteButtonText: {
+    fontSize: 18,
   },
   cardContent: {
     gap: theme.spacing.md,
