@@ -11,7 +11,7 @@ import { StackNavigationProp } from '@react-navigation/stack';
 import { RouteProp } from '@react-navigation/native';
 import LinearGradient from 'react-native-linear-gradient';
 import { RootStackParamList } from '../navigation/types';
-import { Card, Button, Header } from '../components';
+import { Button, Header } from '../components';
 import { theme } from '../theme';
 import { useAppStore } from '../store';
 import { Flashcard, CardRating } from '../types';

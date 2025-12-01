@@ -13,6 +13,8 @@ import IdeaCaptureScreen from '../screens/IdeaCaptureScreen';
 import FlowReactivationScreen from '../screens/FlowReactivationScreen';
 import HyperfocusScreen from '../screens/HyperfocusScreen';
 import { AIFlashcardGeneratorScreen } from '../screens/AIFlashcardGeneratorScreen';
+import DeckManagementScreen from '../screens/DeckManagementScreen';
+import FlashcardEditorScreen from '../screens/FlashcardEditorScreen';
 
 const Stack = createStackNavigator<RootStackParamList>();
 
@@ -37,6 +39,8 @@ export const AppNavigator: React.FC = () => {
         <Stack.Screen name="FlowReactivation" component={FlowReactivationScreen} />
         <Stack.Screen name="Hyperfocus" component={HyperfocusScreen} />
         <Stack.Screen name="AIFlashcardGenerator" component={AIFlashcardGeneratorScreen} />
+        <Stack.Screen name="DeckManagement" component={DeckManagementScreen} />
+        <Stack.Screen name="FlashcardEditor" component={FlashcardEditorScreen} />
       </Stack.Navigator>
     </NavigationContainer>
   );

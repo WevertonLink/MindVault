@@ -7,4 +7,6 @@ export type RootStackParamList = {
   FlowReactivation: { ideaId: string };
   Hyperfocus: undefined;
   AIFlashcardGenerator: undefined;
+  DeckManagement: undefined;
+  FlashcardEditor: { deckId: string; deckName: string };
 };

@@ -161,7 +161,7 @@ export const getAllDecks = async (): Promise<Deck[]> => {
 
 // Flashcard CRUD operations
 export const createFlashcard = async (
-  cardData: Pick<Flashcard, 'deckId' | 'front' | 'back'>
+  cardData: Pick<Flashcard, 'deckId' | 'front' | 'back'> & { nextReviewAt?: number | null }
 ): Promise<string> => {
   const db = getDatabase();
   const id = `card_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`;
@@ -179,7 +179,7 @@ export const createFlashcard = async (
     0, // intervalDays
     2.5, // easeFactor (SM-2 default)
     0, // repetitionCount
-    null, // nextReviewAt
+    cardData.nextReviewAt ?? null, // nextReviewAt (optional, defaults to null)
     now,
     now,
   ]);

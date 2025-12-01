@@ -17,6 +17,12 @@ export const theme = {
     textSecondary: '#CCCCCC',
     textTertiary: '#999999',
     textMuted: '#666666',
+    textDim: '#555555',
+
+    // Cores básicas
+    white: '#FFFFFF',
+    black: '#000000',
+    dark: '#111111',
 
     // Gold com variações elegantes
     gold: '#FFD700',
@@ -46,6 +52,7 @@ export const theme = {
     cardGradient: ['#1A1A1A', '#111111', '#0A0A0A'],
     goldGradient: ['#FFD700', '#FFC700', '#FFB700'],
     backgroundGradient: ['#000000', '#0A0A0A', '#050505'],
+    dark: ['#000000', '#0A0A0A', '#050505'], // Alias for backgroundGradient
     overlayGradient: ['rgba(0,0,0,0)', 'rgba(0,0,0,0.8)'],
 
     // Gradientes sutis para profundidade
@@ -62,6 +69,7 @@ export const theme = {
     },
     fontSize: {
       xs: 10,
+      caption: 11,
       small: 12,
       body: 16,
       subtitle: 18,
@@ -207,6 +215,6 @@ export const theme = {
       slow: 500,
     },
   },
-} as const;
+};
 
 export type Theme = typeof theme;

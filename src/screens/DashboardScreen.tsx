@@ -44,8 +44,8 @@ const DashboardScreen: React.FC<Props> = ({ navigation }) => {
     navigation.navigate('Hyperfocus');
   };
 
-  const handleAIFlashcards = () => {
-    navigation.navigate('AIFlashcardGenerator');
+  const handleManageDecks = () => {
+    navigation.navigate('DeckManagement');
   };
 
   const flowRecommendation = getNextStep({
@@ -127,6 +127,13 @@ const DashboardScreen: React.FC<Props> = ({ navigation }) => {
             size="large"
           />
 
+          <Button
+            title="Gerenciar Decks"
+            onPress={handleManageDecks}
+            variant="secondary"
+            size="large"
+          />
+
           <View style={styles.secondaryActions}>
             <TouchableOpacity
               onPress={handleCaptureIdea}
@@ -157,8 +164,8 @@ const DashboardScreen: React.FC<Props> = ({ navigation }) => {
             </TouchableOpacity>
           </View>
 
-          {/* AI Features */}
-          <View style={styles.aiSection}>
+          {/* AI Features - Temporarily disabled (requires cloud backend) */}
+          {/* <View style={styles.aiSection}>
             <Text style={styles.aiSectionTitle}>✨ IA GENERATIVA</Text>
             <TouchableOpacity
               onPress={handleAIFlashcards}
@@ -176,7 +183,7 @@ const DashboardScreen: React.FC<Props> = ({ navigation }) => {
                 </View>
               </LinearGradient>
             </TouchableOpacity>
-          </View>
+          </View> */}
         </View>
       </ScrollView>
     </LinearGradient>

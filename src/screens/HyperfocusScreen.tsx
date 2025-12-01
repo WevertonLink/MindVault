@@ -22,7 +22,7 @@ const HyperfocusScreen: React.FC<Props> = ({ navigation }) => {
   const [isRunning, setIsRunning] = useState(false);
   const [isBreak, setIsBreak] = useState(false);
   const [completedPomodoros, setCompletedPomodoros] = useState(0);
-  const timerRef = useRef<NodeJS.Timeout | null>(null);
+  const timerRef = useRef<number | null>(null);
 
   useEffect(() => {
     if (isRunning && timeLeft > 0) {

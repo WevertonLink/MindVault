@@ -82,6 +82,7 @@ export const AIFlashcardGeneratorScreen: React.FC<Props> = ({navigation}) => {
       const deckId = await createDeck({
         name: deckName,
         description: `Flashcards gerados por IA sobre ${topic}`,
+        color: '#FFD700',
       });
 
       // Salva todos os flashcards no novo deck
@@ -273,7 +274,7 @@ const styles = StyleSheet.create({
   },
   label: {
     fontSize: 14,
-    color: theme.colors.textMedium,
+    color: theme.colors.textSecondary,
     marginBottom: 8,
     letterSpacing: 1,
   },
